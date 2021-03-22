@@ -1,6 +1,7 @@
 package texteditor;
 
 import javax.swing.*;
+import javax.swing.undo.UndoManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -20,13 +21,21 @@ public class Gui implements ActionListener {
     JMenu menuFile, menuEdit, menuFormat, menuColor;
     //FILE MENU
     JMenuItem iNew, iOpen, iSave, iSaveAs, iExit;
+    //EDIT MENU
+    JMenuItem iUndo, iRedo;
     //FORMAT MENU
     JMenu font, fontSize;
     JMenuItem iWrap, iFontArial, iFontComic, iFontTimes, iFontSize8, iFontSize12, iFontSize16, iFontSize20, iFontSize24, iFontSize28;
-
+    //COLOR MENU
+    JMenuItem iColor1, iColor2, iColor3;
 
     FunctionFile functionFile = new FunctionFile(this);
+    FunctionEdit functionEdit = new FunctionEdit(this);
     FunctionFormat functionFormat = new FunctionFormat(this);
+    FunctionColor functionColor = new FunctionColor(this);
+    KeyHandler keyHandler = new KeyHandler(this);
+
+    UndoManager undoManager = new UndoManager();
 
     public static void main(String[] args) {
         new Gui();
@@ -36,9 +45,12 @@ public class Gui implements ActionListener {
         //there all the magic happens
         createWindow();
         createTextArea();
+
         createMenuBar();
         createFileMenu();
+        createEditMenu();
         createFormatMenu();
+        createColorMenu();
 
         functionFormat.setFont("Arial");
         functionFormat.createFont(16);
@@ -54,6 +66,12 @@ public class Gui implements ActionListener {
 
     public void createTextArea() {
         textArea = new JTextArea();
+
+        textArea.getDocument().addUndoableEditListener(undoableEditEvent -> {
+            undoManager.addEdit(undoableEditEvent.getEdit());
+        });
+        textArea.addKeyListener(keyHandler);
+
         scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         frame.add(scrollPane);
@@ -101,6 +119,18 @@ public class Gui implements ActionListener {
         iExit.addActionListener(this);
         iExit.setActionCommand("Exit");
         menuFile.add(iExit);
+    }
+
+    public void createEditMenu() {
+        iUndo = new JMenuItem("Undo");
+        iUndo.addActionListener(this);
+        iUndo.setActionCommand("Undo");
+        menuEdit.add(iUndo);
+
+        iRedo = new JMenuItem("Redo");
+        iRedo.addActionListener(this);
+        iRedo.setActionCommand("Redo");
+        menuEdit.add(iRedo);
     }
 
     public void createFormatMenu() {
@@ -163,6 +193,23 @@ public class Gui implements ActionListener {
         fontSize.add(iFontSize28);
     }
 
+    public void createColorMenu() {
+        iColor1 = new JMenuItem("White");
+        iColor1.addActionListener(this);
+        iColor1.setActionCommand("White");
+        menuColor.add(iColor1);
+
+        iColor2 = new JMenuItem("Black");
+        iColor2.addActionListener(this);
+        iColor2.setActionCommand("Black");
+        menuColor.add(iColor2);
+
+        iColor3 = new JMenuItem("Blue");
+        iColor3.addActionListener(this);
+        iColor3.setActionCommand("Blue");
+        menuColor.add(iColor3);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
@@ -173,8 +220,10 @@ public class Gui implements ActionListener {
         else if ("Save".equals(command)) functionFile.save();
         else if ("Save as".equals(command)) functionFile.saveAs();
         else if ("Exit".equals(command)) functionFile.exit();
-
-        //Menu format
+            //Menu functionEdit
+        else if ("Undo".equals(command)) functionEdit.undo();
+        else if ("Redo".equals(command)) functionEdit.redo();
+            //Menu functionFont
         else if ("Wrap".equals(command)) functionFormat.wrap();
         else if ("Arial".equals(command)) functionFormat.setFont(command);
         else if ("Comic Sans MS".equals(command)) functionFormat.setFont(command);
@@ -185,6 +234,11 @@ public class Gui implements ActionListener {
         else if ("Font Size 20".equals(command)) functionFormat.createFont(20);
         else if ("Font Size 24".equals(command)) functionFormat.createFont(24);
         else if ("Font Size 28".equals(command)) functionFormat.createFont(28);
+            //Menu functionColor
+        else if ("White".equals(command)) functionColor.setColor(command);
+        else if ("Black".equals(command)) functionColor.setColor(command);
+        else if ("Blue".equals(command)) functionColor.setColor(command);
+
 
     }
 }
