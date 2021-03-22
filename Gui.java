@@ -67,9 +67,8 @@ public class Gui implements ActionListener {
     public void createTextArea() {
         textArea = new JTextArea();
 
-        textArea.getDocument().addUndoableEditListener(undoableEditEvent -> {
-            undoManager.addEdit(undoableEditEvent.getEdit());
-        });
+        textArea.getDocument().addUndoableEditListener(undoableEditEvent ->
+                undoManager.addEdit(undoableEditEvent.getEdit()));
         textArea.addKeyListener(keyHandler);
 
         scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -239,6 +238,6 @@ public class Gui implements ActionListener {
         else if ("Black".equals(command)) functionColor.setColor(command);
         else if ("Blue".equals(command)) functionColor.setColor(command);
 
-
+        //Have a nice day!
     }
 }
